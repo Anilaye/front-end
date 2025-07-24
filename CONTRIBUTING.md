@@ -7,8 +7,8 @@
 
 ## Installation rapide
 ```bash
-git clone https://github.com/Anilaye/back-end.git
-cd back-end
+git clone https://github.com/Anilaye/front-end.git
+cd front-end
 npm install
 npm run dev
 ```
@@ -26,8 +26,8 @@ npm run dev
 
 ## Quick setup
 ```bash
-git clone https://github.com/Anilaye/back-end.git
-cd back-end
+git clone https://github.com/Anilaye/front-end.git
+cd front-end
 npm install
 npm run dev
 ```
