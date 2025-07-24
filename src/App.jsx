@@ -4,8 +4,8 @@ import './index.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 function App() {
   return (
-      <div className={'container'}>
-        hello <button className={'btn btn-danger'}></button>
+      <div className={'container text-center mt-5'}>
+          <h1>FRONTEND ANILAY'O</h1>
       </div>
   );
 }
