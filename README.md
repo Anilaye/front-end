@@ -2,7 +2,7 @@
 
 # Anilaye'O - Tableau de bord
 
-Ce projet vise à proposer un tableau de bord moderne pour suivre l'activité des points d'eau distribués par Anilaye’O : volume d’eau consommé, nombre d’utilisateurs actifs, suivi des filtres et des capteurs IoT.
+Ce projet vise à proposer un tableau de bord moderne pour suivre l'activité des points d'eau distribués par Anilaye’O : volume d’eau consommé, suivi des filtres et des capteurs IoT.
 
 ## Technologies utilisées
 - React + Vite
@@ -23,7 +23,7 @@ npm run dev
 
 ---
 
-This dashboard project aims to visualize real-time water usage data from Anilaye’O’s community water points, including liters distributed, active users, and filter/capacity status.
+This dashboard project aims to visualize real-time water usage data from Anilaye’O’s community water points, including liters distributed, and filter/capacity status.
 
 ## Stack
 - React + Vite
