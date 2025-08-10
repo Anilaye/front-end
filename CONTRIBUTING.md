@@ -12,11 +12,6 @@ cd front-end
 npm install
 npm run dev
 ```
-
-## Communication
-- Slack équipe : #groupe-29
-- Documentation : Notion > Espace "Tech & Produits"
-
 ---
 
 ## Conventions
