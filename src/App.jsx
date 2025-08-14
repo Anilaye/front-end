@@ -1,13 +1,36 @@
-// import { useState } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
-import './App.css'
+import { Routes, Route, Navigate } from "react-router-dom";
+import ProtectedRoute from "./components/ProtectedRoute";
+import NavBar from "./components/NavBar";
+import Login from "./pages/Login";
+import Dashboard from "./pages/Dashboard";
+import Users from "./pages/Users";
 
-function App() {
-
+export default function App() {
   return (
-    <h1>Bienvenue sur l'application Anilaye</h1>
-  )
+    <div className="min-h-screen">
+      <NavBar />
+      <Routes>
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute requireAdmin>
+              <Users />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<div className="p-6">404</div>} />
+      </Routes>
+    </div>
+  );
 }
 
-export default App
