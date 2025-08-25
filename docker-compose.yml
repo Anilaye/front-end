@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  anilayo-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: anilayo-dashboard
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"  # Pour HTTPS si nécessaire
+    volumes:
+      - ./logs:/var/log/nginx  # Logs nginx
+    environment:
+      - NODE_ENV=production
+    networks:
+      - anilayo-network
+
+  # Service optionnel pour le monitoring
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy
+    container_name: nginx-proxy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./nginx-proxy/certs:/etc/nginx/certs:ro
+      - ./nginx-proxy/vhost.d:/etc/nginx/vhost.d
+      - ./nginx-proxy/html:/usr/share/nginx/html
+    networks:
+      - anilayo-network
+
+networks:
+  anilayo-network:
+    driver: bridge
+
+volumes:
+  nginx-logs:

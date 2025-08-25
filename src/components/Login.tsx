@@ -130,8 +130,9 @@ export function Login({ onLogin, onSwitchToRegister }: LoginProps) {
               <div className="space-y-2">
                 <Label htmlFor="role">Type d'administration</Label>
                 <Select 
-                  value={formData.role} 
-                  onValueChange={(value: 'admin-supervision' | 'admin-paiements') => 
+                  value={"admin-supervision"}
+                  // value={"formData.role"}
+                  onValueChange={(value: 'admin-supervision' | 'admin-paiements') =>
                     setFormData(prev => ({ ...prev, role: value }))
                   }
                 >
@@ -164,7 +165,8 @@ export function Login({ onLogin, onSwitchToRegister }: LoginProps) {
                     id="email"
                     type="email"
                     placeholder="admin@anilaye.sn"
-                    value={formData.email}
+                    value={"admin.supervision@anilaye.sn"}
+                    // value={formData.email}
                     onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                     className="pl-10"
                     required
@@ -181,7 +183,8 @@ export function Login({ onLogin, onSwitchToRegister }: LoginProps) {
                     id="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    value={formData.password}
+                    // value={formData.password}
+                    value={"supervision123"}
                     onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                     className="pl-10 pr-10"
                     required
