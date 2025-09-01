@@ -1,46 +1,68 @@
 import { useState } from "react";
-import { loginRequest } from "../services/api";
-import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { supabase } from "../lib/supabaseClient";
+// import { supabase } from "../../lib/supabaseClient";
 
-export default function Login() {
-  const nav = useNavigate();
-  const { signin } = useAuth();
-  const [form, setForm] = useState({ email: "", password: "" });
+export default function LoginForm() {
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e) {
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setLoading(true);
+
     try {
-      const data = await loginRequest(form.email, form.password);
-      signin(data); // { token, user }
-      nav("/dashboard");
+      const { data, error: loginError } = await supabase({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (loginError) throw loginError;
+
+      alert("Connexion réussie !");
+      console.log("User:", data.user);
     } catch (err) {
-      setError(err.message || "Erreur de connexion");
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4 border p-6 rounded-xl">
-        <h1 className="text-2xl font-bold">Connexion</h1>
-        {error && <div className="text-red-600 text-sm">{error}</div>}
-        <input
-          className="w-full border p-2 rounded"
-          placeholder="Email"
-          type="email"
-          value={form.email}
-          onChange={(e) => setForm({ ...form, email: e.target.value })}
-        />
-        <input
-          className="w-full border p-2 rounded"
-          placeholder="Mot de passe"
-          type="password"
-          value={form.password}
-          onChange={(e) => setForm({ ...form, password: e.target.value })}
-        />
-        <button className="w-full bg-blue-600 text-white py-2 rounded">Se connecter</button>
-      </form>
-    </div>
+    <form onSubmit={handleSubmit} className="space-y-4 p-6 max-w-md mx-auto bg-white shadow-lg rounded-xl">
+      <h2 className="text-xl font-semibold text-gray-700">Connexion</h2>
+
+      {error && <p className="text-red-500 text-sm">{error}</p>}
+
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        value={formData.email}
+        onChange={handleChange}
+        className="w-full border p-2 rounded"
+      />
+      <input
+        type="password"
+        name="password"
+        placeholder="Mot de passe"
+        value={formData.password}
+        onChange={handleChange}
+        className="w-full border p-2 rounded"
+      />
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
+      >
+        {loading ? "Connexion..." : "Se connecter"}
+      </button>
+    </form>
   );
 }

@@ -1,36 +1,22 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import ProtectedRoute from "./components/ProtectedRoute";
-import NavBar from "./components/NavBar";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+// import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
+// import NavBar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
-import Users from "./pages/Users";
+// import Iot from "./pages/IoT";
+// import Users from "./pages/Users";
 
 export default function App() {
-  return (
-    <div className="min-h-screen">
-      <NavBar />
+   return (
+    <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/users"
-          element={
-            <ProtectedRoute requireAdmin>
-              <Users />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="*" element={<div className="p-6">404</div>} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
-    </div>
+    </BrowserRouter>
   );
 }
 
