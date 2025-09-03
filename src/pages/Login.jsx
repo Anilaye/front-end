@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
+import { User, Mail, Lock } from 'lucide-react';
 import logoAnilaye from '/src/assets/logoAnilaye.png';
 import "/src/index.css";
 
@@ -59,42 +60,76 @@ export default function LoginForm() {
               className="h-20 w-20 rounded-full anilaye-logo"
             />
           </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Anilaye</h1>
-            <p className="text-purple-600 font-medium mb-1">O'SEN-Ndoxmusell</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Anilaye</h1>
+          <p className="text-purple-600 font-medium mb-1">O'SEN-Ndoxmusell</p>
+          <h2 className="text-xl font-semibold text-gray-700">Authentification</h2>
         </div>
-      </div>
 
-      <div className="anilaye-card border-purple-200 shadow-xl">
-        <div className="p-6">
-          <form onSubmit={handleSubmit} className="space-y-4 p-6 max-w-md mx-auto bg-white shadow-lg rounded-xl">
-            <h2 className="text-xl font-semibold text-gray-700">Connexion</h2>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+        <div className="anilaye-card border-purple-200 shadow-xl">
+          <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-t-lg">
+            <div className="text-center flex items-center justify-center space-x-6">
+              <User />
+              <span>Connexion</span>
+            </div>
+          </div>
+          <div className="p-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* <h2 className="text-xl font-semibold text-gray-700">Connexion</h2> */}
+              <div className="space-y-2">
+                {error && <p className="text-red-500 text-sm">{error}</p>}
+                  <label htmlFor="email">Adresse email *</label>
+                  <div className="relative">
+                    <Mail className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                      className="w-full border p-2 pl-8 rounded"
+                    />
+                  </div>
+              </div>
 
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-            />
-            <input
-              type="password"
-              name="password"
-              placeholder="Mot de passe"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-            />
+              <div className="space-y-2 ">
+                <label htmlFor="password">Mot de passe *</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                  <input
+                    type="password"
+                    name="password"
+                    placeholder="••••••••"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
+                    className="w-full border p-2 pl-10 rounded"
+                  />
+                </div>
+              </div>
+              
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 anilaye-button"
+              >
+                {loading ? "Connexion..." : "Se connecter"}
+              </button>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700"
-            >
-              {loading ? "Connexion..." : "Se connecter"}
-            </button>
-          </form>
+              <div className="text-center">
+                <p className="text-sm text-gray-600">
+                  Pas encore de compte ?{" "}
+                  <button
+                      type="button"
+                      onClick={() => navigate("/register")}
+                      className="text-purple-600 hover:text-purple-800 font-medium"
+                  >
+                    S'inscrire
+                  </button>
+                </p>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
