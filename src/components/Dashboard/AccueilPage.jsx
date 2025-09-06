@@ -1,44 +1,40 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import { supabase } from "../lib/supabaseClient";
 import WaterPointsList from "../components/Dashboard/WaterPointsList";
 import PaymentService from "../components/Dashboard/PaymentService";
-import Charts from "../components/Dashboard/Charts";
-import MapView from "../components/Dashboard/MapView";
-import { Search, Eye, Wrench, MapPin, Activity, AlertTriangle, DollarSign } from "lucide-react";
-import "/src/index.css";
 
-export default function Dashboard() {
-  const [waterPoints, setWaterPoints] = useState([]);
-  const [payments, setPayments] = useState([]);
-  const [iotData, setIotData] = useState([]);
 
-  useEffect(() => {
+export default function Accueil() {
+    // const [searchTerm, setSearchTerm] = useState('');
+    const [waterPoints, setWaterPoints] = useState([]);
+    const [payments, setPayments] = useState([]);
+    const [iotData, setIotData] = useState([]);
+
+    useEffect(() => {
     fetchWaterPoints();
     fetchPayments();
     fetchIoT();
-  }, []);
+    }, []);
 
-  async function fetchWaterPoints() {
-    let { data, error } = await supabase.from("water_points").select("*");
-    if (!error) setWaterPoints(data);
-  }
+    async function fetchWaterPoints() {
+        let { data, error } = await supabase.from("water_points").select("*");
+        if (!error) setWaterPoints(data);
+      }
+    
+    async function fetchPayments() {
+        let { data, error } = await supabase.from("payments").select("*");
+        if (!error) setPayments(data);
+    }
+    
+    async function fetchIoT() {
+        let { data, error } = await supabase.from("iot_readings").select("*");
+        if (!error) setIotData(data);
+    }
 
-  async function fetchPayments() {
-    let { data, error } = await supabase.from("payments").select("*");
-    if (!error) setPayments(data);
-  }
-
-  async function fetchIoT() {
-    let { data, error } = await supabase.from("iot_readings").select("*");
-    if (!error) setIotData(data);
-  }
-
-
-  return (
     <div className="p-6 space-y-6 bg-gradient-to-br from-purple-50/30 via-blue-50/30 to-cyan-50/30 min-h-full">
-      {/* Header */}
+      {/* En-tête avec titre et slogan */}
       <div className="text-center space-y-2 mb-8">
-        <h1 className="text-4xl font-bold anilaye-gradient bg-clip-text text-white">
+        <h1 className="text-4xl font-bold anilaye-gradient bg-clip-text text-transparent">
           Anilaye
         </h1>
         <p className="text-lg text-purple-600 font-medium">
@@ -95,75 +91,6 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-
-      {/* Cards de synthèse */}
-      <div className="shadow-lg border-purple-100">
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-t-lg">
-          <div className="flex items-center space-x-2">
-            <MapPin className="h-5 w-5" />
-            <span>
-              Localisation GPS des distributeurs - Dakar,
-              Sénégal
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Contenu */}
-      {/* <div className="p-0">
-        <div className="h-96 w-full">
-          <MapView points={waterPoints} />
-        </div>
-        <div className="p-4 bg-gray-50 border-t">
-          <div className="flex items-center justify-between text-sm text-gray-600">
-            <div className="flex items-center space-x-6">
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span>
-                    Distributeurs actifs (
-                    {
-                      waterPoints.filter(
-                        (d) => d.status === "active",
-                      ).length
-                    }
-                    )
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  <span>
-                    Distributeurs inactifs (
-                    {
-                      waterPoints.filter(
-                        (d) => d.status === "inactive",
-                      ).length
-                    }
-                    )
-                  </span>
-                </div>
-              </div>
-              <div className="text-xs text-gray-500 bg-white px-2 py-1 rounded">
-                Cliquez sur un marqueur pour voir les détails
-              </div>
-          </div>
-        </div>
-      </div> */}
-      {/* <div className="p-6 grid grid-cols-2 gap-6">
-        <div className="bg-white rounded shadow p-4">
-          <h2 className="font-bold mb-2">Liste des distributeurs</h2>
-          <WaterPointsList data={waterPoints} />
-        </div>
-        <div className="bg-white rounded shadow p-4">
-          <h2 className="font-bold mb-2">Transactions</h2>
-          <PaymentService data={payments} />
-        </div>
-        <div className="col-span-2 bg-white rounded shadow p-4">
-          <Charts data={iotData} />
-        </div>
-        <div className="col-span-2 bg-white rounded shadow p-4 h-[400px]">
-          <MapView points={waterPoints} />
-        </div>
-      </div> */}
 
       {/* Liste des distributeurs */}
       <div className="anilaye-card">
@@ -306,7 +233,6 @@ export default function Dashboard() {
           )}
         </table>
       </div>
-      </div>  
+      </div>
     </div>
-  );
 }

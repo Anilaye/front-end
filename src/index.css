@@ -5426,6 +5426,17 @@ html {
   overflow: hidden;
 }
 
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.5rem; /* optionnel pour arrondir la carte */
+}
+
+.leaflet-div-icon {
+  background: transparent;
+  border: none;
+}
+
 @keyframes pulse {
   50% {
     opacity: .5;
