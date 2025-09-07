@@ -1,23 +1,75 @@
-import React from "react";
-import { Droplets, Activity, AlertTriangle, Filter, Maximize, RefreshCw, Search } from "lucide-react";
+import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import { supabase } from "../../lib/supabaseClient";
 import "/src/index.css";
 
+// Fixe le bug des icônes Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+});
 
-export default function MapView({ points }) {
-  if (!points || points.length === 0) {
-    return <p className="text-gray-500">Aucun point d’eau disponible.</p>;
+const MapView = () => {
+  const [distributors, setDistributors] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchWaterPoints();
+  }, []);
+
+  async function fetchWaterPoints() {
+    try {
+      let { data, error } = await supabase
+        .from("water_points")
+        .select(
+          `
+          id,
+          latitude,
+          longitude,
+          community,
+          filter_status,
+          iot_readings (
+            id,
+            created_at,
+            volume_l,
+            turbidity,
+            battery,
+            filter_health
+          )
+        `
+        );
+
+      if (error) throw error;
+
+      const enriched = data.map((wp) => {
+        const lastReading = wp.iot_readings?.[0] || {};
+        return {
+          ...wp,
+          name: wp.community || `Distributeur ${wp.id}`,
+          volume: lastReading.volume_l || 0,
+          filter_health: lastReading.filter_health || "N/A",
+          turbidity: lastReading.turbidity || null,
+          battery: lastReading.battery || null,
+          active: lastReading.battery > 20, // actif si batterie OK
+        };
+      });
+
+      setDistributors(enriched);
+    } catch (err) {
+      console.error("Erreur récupération MapView:", err);
+    } finally {
+      setLoading(false);
+    }
   }
 
-  const DefaultIcon = L.Icon.Default;
-  DefaultIcon.mergeOptions({
-    iconRetinaUrl:
-      "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  });
+  if (loading) {
+    return <p className="p-6 text-gray-500">Chargement de la carte...</p>;
+  }
 
   return (
     <div className="p-6 space-y-6 bg-gradient-to-br from-purple-50/30 via-blue-50/30 to-cyan-50/30 min-h-full">
@@ -47,73 +99,81 @@ export default function MapView({ points }) {
           </div>
         </div>
       </div>
-      <div className="anilaye-card border-purple-100">
-        <div className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <h3 className="font-medium text-gray-900">Contrôles de la carte</h3>
-              <div className="flex items-center space-x-2">
-              </div>
-            </div>
-            <div className="flex items-center space-x-2">
-              <button variant="outline" size="sm">
-                <Filter className="h-4 w-4 mr-2" />
-                Filtres
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="flex items-center space-x-2">
-        <button variant="outline" size="sm">
-          <RefreshCw className="h-4 w-4 mr-2" />
-            Actualiser
-        </button>
-        <button variant="outline" size="sm">
-          <Maximize className="h-4 w-4 mr-2" />
-          Plein écran
-        </button>
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <div className="lg:col-span-3">
           <div className="anilaye-card border-purple-200">
             <div className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-t-lg">
               <div className="flex items-center space-x-2">
-                <span>Réseau de Distribution - Dakar</span>
-              </div>
+              <span>Réseau de Distribution - Dakar</span>
             </div>
-            <div className="p-0">
-              <div className="h-[600px]">
-                <MapContainer
-                  center={[14.6928, -17.4467]} // Dakar par défaut
+          </div>
+          <div className="p-0">
+            <div className="h-[600px]">
+              <h2 className="text-xl font-semibold mb-4">Vue Carte des Distributeurs</h2>
+              <MapContainer
+                  center={[14.6937, -17.4441]} // par défaut Dakar
                   zoom={12}
-                  className="h-full w-full rounded"
+                  style={{ height: "600px", width: "100%" }}
                 >
                   <TileLayer
                     attribution='&copy; OpenStreetMap contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
-                  {points.map((p) => (
-                    <Marker key={p.id} position={[p.latitude, p.longitude]}>
+
+                  {distributors.map((d) => (
+                    <Marker key={d.id} position={[d.latitude, d.longitude]}>
                       <Popup>
-                        <div className="font-bold">{p.name}</div>
-                        <p>Commune : {p.community}</p>
-                        <p>État filtre : {p.filter_status}</p>
+                        <div className="space-y-2">
+                          <h3 className="font-bold text-purple-700">{d.name}</h3>
+                          <p className="text-sm text-gray-600">Localisation: {d.community}</p>
+                          <p
+                            className={`text-sm font-medium ${
+                              d.active ? "text-green-600" : "text-red-600"
+                            }`}
+                          >
+                            Statut: {d.active ? "Actif" : "Inactif"}
+                          </p>
+                          <p className="text-sm">
+                            Volume: <span className="font-medium">{d.volume} L</span>
+                          </p>
+                          <p className="text-sm">
+                            Turbidité:{" "}
+                            <span className="font-medium">
+                              {d.turbidity !== null ? d.turbidity : "N/A"}
+                            </span>
+                          </p>
+                          <p className="text-sm">
+                            Batterie:{" "}
+                            <span
+                              className={`font-medium ${
+                                d.battery > 30
+                                  ? "text-green-600"
+                                  : d.battery > 15
+                                  ? "text-yellow-600"
+                                  : "text-red-600"
+                              }`}
+                            >
+                              {d.battery !== null ? `${d.battery}%` : "N/A"}
+                            </span>
+                          </p>
+                          <p className="text-sm">
+                            État filtre:{" "}
+                            <span className="font-medium">{d.filter_status}</span>
+                          </p>
+                        </div>
                       </Popup>
                     </Marker>
                   ))}
-                </MapContainer>
-                {/* <InteractiveMap
-                  distributors={distributors}
-                  onDistributorSelect={onDistributorSelect}
-                /> */}
-              </div>
+              </MapContainer>
             </div>
           </div>
         </div>
       </div>
+      </div>
     </div>
-
+  
+  
   );
-}
+};
+
+export default MapView;
