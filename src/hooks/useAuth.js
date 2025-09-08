@@ -1,80 +1,74 @@
 import { useState, useEffect, useContext, createContext } from "react";
 import { supabase } from "../lib/supabaseClient";
 
-const AuthContext = createContext(null);
+const AuthContext = createContext();
+
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null); 
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("anilaye_user");
-    const storedProfile = localStorage.getItem("anilaye_profile");
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
 
-    if (storedUser) setUser(JSON.parse(storedUser));
-    if (storedProfile) setProfile(JSON.parse(storedProfile));
-
+        if (parsedUser[0]?.id) {
+          fetchProfile(parsedUser[0].id);
+        }
+      } catch (e) {
+        console.error("Erreur parsing user localStorage:", e);
+        localStorage.removeItem("user");
+      }
+    }
     setLoading(false);
   }, []);
 
-  const signIn = async (email, password) => {
+  async function fetchProfile(userId) {
     try {
-      setLoading(true);
-
-      const { data: userData, error: userError } = await supabase
-        .from("users")
-        .select("*")
-        .eq("email", email)
-        .eq("password", password) 
-        .single();
-
-      if (userError || !userData) {
-        throw new Error("Email ou mot de passe incorrect.");
-      }
-
-      const { data: profileData } = await supabase
+      const { data, error } = await supabase
         .from("profiles")
         .select("*")
-        .eq("user_id", userData.id)
+        .eq("id", userId)
         .single();
 
-      localStorage.setItem("anilaye_user", JSON.stringify(userData));
-      if (profileData) {
-        localStorage.setItem("anilaye_profile", JSON.stringify(profileData));
+      if (!error && data) {
+        setProfile(data);
       }
-
-      setUser(userData);
-      setProfile(profileData || null);
-
-      return { success: true };
     } catch (err) {
-      console.error("Erreur signIn:", err.message);
-      return { success: false, error: err.message };
-    } finally {
-      setLoading(false);
+      console.error("Erreur fetchProfile:", err);
+    }
+  }
+
+  const signIn = (userData) => {
+    setUser(userData);
+    localStorage.setItem("user", JSON.stringify(userData));
+    if (userData[0]?.id) {
+      fetchProfile(userData[0].id);
     }
   };
 
   const signOut = () => {
-    localStorage.removeItem("anilaye_user");
-    localStorage.removeItem("anilaye_profile");
     setUser(null);
     setProfile(null);
+    localStorage.removeItem("user");
   };
 
-  const value = {
-    user,
-    profile,
-    role: profile?.role || user?.role || null,
-    isAdmin:
-      (profile?.role?.toLowerCase?.() === "admin") ||
-      (user?.role?.toLowerCase?.() === "admin"),
-    loading,
-    signIn,
-    signOut,
-  };
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        profile,
+        loading,
+        signIn,
+        signOut,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };

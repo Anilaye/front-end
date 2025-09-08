@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { Home, BarChart3, CreditCard, FileText, LogOut, User } from 'lucide-react';
+// import { useNavigate } from "react-router-dom";
+// import { useAuth } from "../hooks/useAuth";
 import "/src/index.css";
 import logoAnilaye from '/src/assets/logoAnilaye.png';
 
-// Import des composants de pages
 import AccueilPage from "../components/Dashboard/AccueilPage";
 import EtatDistributeurPage from "../components/Dashboard/EtatDistributeurPage";
 import TransactionPage from "../components/Dashboard/TransactionPage";
@@ -70,6 +71,23 @@ const LoadingSpinner = () => (
     </div>
   </div>
 );
+
+// const onLogout = async () => {
+//   const { signOut } = useAuth(); 
+//   const navigate = useNavigate(); 
+
+//   try {
+//     const { error } = await supabase.signOut();
+//     if (error) throw error;
+
+//     signOut();
+
+//     navigate("/login", { replace: true });
+//   } catch (err) {
+//     console.error("Erreur lors de la déconnexion :", err.message);
+//     alert("Une erreur est survenue lors de la déconnexion.");
+//   }
+// };
 
 const Header = ({ currentUser, onLogout }) => (
   <header className="bg-gradient-to-r from-purple-500 to-blue-600 text-white p-4 flex justify-between items-center">
