@@ -2,11 +2,13 @@ import { useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { User, Mail, Lock } from 'lucide-react';
+import { useAuth } from "../hooks/useAuth";
 import logoAnilaye from '/src/assets/logoAnilaye.png';
 import "/src/index.css";
 
 export default function LoginForm() {
   const navigate = useNavigate();
+  const { signIn } = useAuth();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -36,7 +38,7 @@ export default function LoginForm() {
 
       setFormData({ email: "", password: "" });
 
-      localStorage.setItem("user", JSON.stringify(user));
+      signIn(user);
 
       alert("Connexion réussie !");
 

@@ -17,23 +17,11 @@ export default function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Dashboard />} />
           </Route>
-          
+
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>
     </AuthProvider>
-    // <BrowserRouter>
-    //   <Routes>
-    //     <Route path="/" element={<Navigate to="/login" replace />} />
-    //     <Route path="/login" element={<Login />} />
-    //     <Route path="/register" element={<Register />} />
-    //     <Route path="/dashboard/*" element={
-    //       <ProtectedRoute requireAdmin={true}>
-    //         <Dashboard />
-    //       </ProtectedRoute>
-    //     } />
-    //   </Routes>
-    // </BrowserRouter>
   );
 }
 

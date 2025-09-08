@@ -17,7 +17,7 @@ export default function ProtectedRoute({ requireAdmin = false }) {
   }
 
   if (requireAdmin && !isAdmin) {
-    // return <Navigate to="/" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <Outlet />;
