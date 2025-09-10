@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { Home, BarChart3, CreditCard, FileText, LogOut, User } from 'lucide-react';
-// import { useNavigate } from "react-router-dom";
-// import { useAuth } from "../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 import "/src/index.css";
 import logoAnilaye from '/src/assets/logoAnilaye.png';
 
@@ -72,23 +72,6 @@ const LoadingSpinner = () => (
   </div>
 );
 
-// const onLogout = async () => {
-//   const { signOut } = useAuth(); 
-//   const navigate = useNavigate(); 
-
-//   try {
-//     const { error } = await supabase.signOut();
-//     if (error) throw error;
-
-//     signOut();
-
-//     navigate("/login", { replace: true });
-//   } catch (err) {
-//     console.error("Erreur lors de la déconnexion :", err.message);
-//     alert("Une erreur est survenue lors de la déconnexion.");
-//   }
-// };
-
 const Header = ({ currentUser, onLogout }) => (
   <header className="bg-gradient-to-r from-purple-500 to-blue-600 text-white p-4 flex justify-between items-center">
     <div className="flex items-center space-x-4">
@@ -102,7 +85,7 @@ const Header = ({ currentUser, onLogout }) => (
       <div className="flex items-center space-x-2">
         <User className="h-5 w-5" />
         <div className="text-right">
-          <p className="text-sm font-medium">{currentUser?.name || 'Administrateur Anilaye'}</p>
+          <p className="text-sm font-medium">{currentUser?.name || currentUser?.email || 'Administrateur Anilaye'}</p>
           <p className="text-xs opacity-75">Administrateur</p>
         </div>
       </div>
@@ -205,15 +188,40 @@ const renderCurrentPage = (currentPage, data) => {
 // Main Component
 export default function Dashboard({ currentUser, onLogout }) {
   const [currentPage, setCurrentPage] = useState('accueil');
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
   
   const dashboardData = useDataFetching();
+
+  const handleLogout = () => {
+    const confirmation = window.confirm(
+      "Êtes-vous sûr de vouloir vous déconnecter ? Vous devrez vous reconnecter pour accéder au tableau de bord."
+    );
+    
+    if (confirmation) {
+      try {
+
+        signOut();
+        
+        if (onLogout) {
+          onLogout();
+        }
+        
+        navigate("/login", { replace: true });
+      } catch (err) {
+        console.error("Erreur lors de la déconnexion:", err);
+        alert("Erreur lors de la déconnexion. Tentative de redirection...");
+        navigate("/login", { replace: true });
+      }
+    }
+  };
 
   if (dashboardData.loading) return <LoadingSpinner />;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50/30 via-blue-50/30 to-cyan-50/30">
       {/* Header fixe */}
-      <Header currentUser={currentUser} onLogout={onLogout} />
+      <Header currentUser={currentUser} onLogout={handleLogout} />
       
       {/* Navigation */}
       <Navigation currentPage={currentPage} setCurrentPage={setCurrentPage} />
